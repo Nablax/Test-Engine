@@ -1,12 +1,6 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include "camera.h"
-#include <model.h>
-#include <skybox.h>
-#include <iostream>
+#include "my_classes/camera.h"
+#include "skybox.hpp"
+#include "libs.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
