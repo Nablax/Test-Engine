@@ -7,8 +7,9 @@
 
 #include "texture.hpp"
 #include "shader.hpp"
+#include "base.hpp"
 
-namespace Cube{
+namespace cube{
     float vertices[] = {
             // back face
             -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
@@ -54,35 +55,42 @@ namespace Cube{
             -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left
     };
 
-    unsigned int cubeVAO = 0;
-    unsigned int cubeVBO = 0;
-    void renderCube()
-    {
-        // initialize (if necessary)
-        if (cubeVAO == 0)
-        {
+    const std::string defaultVsPath = "../shader/cube.vs";
+    const std::string defaultFsPath = "../shader/cube.fs";
+    const std::string defaultTexture = "../texture/container.jpg";
 
-            glGenVertexArrays(1, &cubeVAO);
-            glGenBuffers(1, &cubeVBO);
-            // fill buffer
-            glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-            // link vertex attributes
-            glBindVertexArray(cubeVAO);
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-            glEnableVertexAttribArray(2);
-            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glBindVertexArray(0);
-        }
-        // render Cube
-        glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+    unsigned int VAO = 0, VBO = 0;
+
+    void genCube(){
+        if(VAO != 0)
+            return;
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        glBindVertexArray(VAO);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
         glBindVertexArray(0);
     }
+
+    class Cube: public base{
+    public:
+        Cube(){
+            genCube();
+            VBO = cube::VBO;
+            VAO = cube::VAO;
+        }
+        Cube(unsigned int vao, unsigned int vbo):base(vao, vbo){
+
+        }
+        ~Cube(){
+
+        }
+    };
+
 }
 
 #endif //TEST_CUBE_HPP

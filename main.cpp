@@ -1,5 +1,6 @@
 #include "my_classes/camera.h"
 #include "skybox.hpp"
+#include "cube.hpp"
 #include "libs.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -50,7 +51,7 @@ int main()
     glfwSetScrollCallback(window, scroll_callback);
 
     // tell GLFW to capture our mouse
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -66,6 +67,9 @@ int main()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     skybox::Skybox skybox;
+    cube::Cube cube1;
+    Shader cubeShader = Shader(cube::defaultVsPath, cube::defaultFsPath);
+
 
     // render loop
     // -----------
@@ -88,6 +92,10 @@ int main()
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         skybox.render(view, projection);
 
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+        model = glm::scale(model, glm::vec3(0.5));
+        cube1.render(cubeShader, view, projection, model);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
