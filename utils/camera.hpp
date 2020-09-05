@@ -9,7 +9,7 @@
 namespace Camera{
 
     const glm::vec3 FRONT(0.0f, 0.0f, -1.0f);
-    const glm::vec3 WORLDUP(0.0f, 1.0f, 0.0f);
+
     const glm::vec3 POSITION = glm::vec3(0.0f);
 
     const float YAW = -90.0f;
@@ -29,7 +29,7 @@ namespace Camera{
 
     class MyCamera {
     public:
-        MyCamera(glm::vec3 position, glm::vec3 worldup, float yaw=YAW, float pitch=PITCH)
+        MyCamera(glm::vec3 position, glm::vec3 worldup = const_value::WORLDUP, float yaw=YAW, float pitch=PITCH)
                 : Front(Camera::FRONT), CameraSpeed(Camera::SPEED), MouseSensitivity(Camera::SENSITIVITY), Zoom(Camera::ZOOM){
             Position = position;
             WorldUp = worldup;

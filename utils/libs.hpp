@@ -19,4 +19,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+namespace const_value{
+    const double gravity = 9.8;
+    const glm::vec3 FRONT(0.0f, 0.0f, -1.0f);
+    const glm::vec3 WORLDUP(0.0f, 1.0f, 0.0f);
+}
+
 #endif //TEST_LIBS_HPP

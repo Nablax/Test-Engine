@@ -70,6 +70,10 @@ int main()
     cube::Cube cube1;
     Shader cubeShader = Shader(cube::defaultVsPath, cube::defaultFsPath);
 
+    float a = 9.8;
+    float v = 0;
+    float path = 0;
+    float floor = 20;
 
     // render loop
     // -----------
@@ -93,7 +97,14 @@ int main()
         skybox.render(view, projection);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+
+        v += a * deltaTime;
+        path += v * deltaTime;
+
+        if(path > floor)
+            v *= -1;
+
+        model = glm::translate(model, glm::vec3(-1.0f, 0.0f - path, -1.0f));
         model = glm::scale(model, glm::vec3(0.5));
         cube1.render(cubeShader, view, projection, model);
 
@@ -179,51 +190,3 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
 }
-
-// utility function for loading a 2D texture from file
-// ---------------------------------------------------
-unsigned int loadTexture(char const * path, bool gammaCorrection)
-{
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-
-    int width, height, nrComponents;
-    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
-    if (data)
-    {
-        GLenum internalFormat;
-        GLenum dataFormat;
-        if (nrComponents == 1)
-        {
-            internalFormat = dataFormat = GL_RED;
-        }
-        else if (nrComponents == 3)
-        {
-            internalFormat = gammaCorrection ? GL_SRGB : GL_RGB;
-            dataFormat = GL_RGB;
-        }
-        else if (nrComponents == 4)
-        {
-            internalFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
-            dataFormat = GL_RGBA;
-        }
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
-
-    return textureID;
-} 

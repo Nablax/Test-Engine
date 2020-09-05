@@ -89,6 +89,8 @@ namespace cube{
         ~Cube(){
 
         }
+    private:
+        glm::vec3 velocity;
     };
 
 }
