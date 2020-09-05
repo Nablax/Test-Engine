@@ -14,8 +14,7 @@
 namespace skybox{
     const std::string vsPath = "../shader/skybox.vs";
     const std::string fsPath = "../shader/skybox.fs";
-    const std::vector<std::string> faces
-        {
+    const std::vector<std::string> faces{
             "../texture/skybox/right.jpg",
             "../texture/skybox/left.jpg",
             "../texture/skybox/top.jpg",
@@ -71,28 +70,25 @@ class Skybox: public base{
     public:
         explicit Skybox(std::vector<std::string> facePath = faces, const std::string& vsp = skybox::vsPath,
                const std::string& fsp = skybox::fsPath):skyboxShader(shader::MyShader(vsp, fsp)){
-            skyboxTexture = TextureUtils::loadCubemap(std::move(facePath));
+            skyboxTexture = textureutils::loadCubemap(std::move(facePath));
             skyboxShader.use();
             skyboxShader.setInt("skybox", 0);
             activateSkyboxTexture(0);
-            glGenVertexArrays(1, &VAO);
-            glGenBuffers(1, &VBO);
-            glBindVertexArray(VAO);
-            glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            glGenVertexArrays(1, &mVAO);
+            glGenBuffers(1, &mVBO);
+            glBindVertexArray(mVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, mVBO);
             glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
             glEnableVertexAttribArray(0);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         }
-        ~Skybox(){
-//            glDeleteVertexArrays(1, &skyboxVAO);
-//            glDeleteBuffers(1, &skyboxVBO);
-        }
+        virtual ~Skybox() = default;
         void render(glm::mat4 view, glm::mat4 projection){
             glDepthFunc(GL_LEQUAL);
             skyboxShader.use();
             skyboxShader.setMat4("view", glm::mat4(glm::mat3(view)));
             skyboxShader.setMat4("projection", projection);
-            glBindVertexArray(VAO);
+            glBindVertexArray(mVAO);
             glDrawArrays(GL_TRIANGLES, 0, 36);
             glBindVertexArray(0);
             glDepthFunc(GL_LESS);

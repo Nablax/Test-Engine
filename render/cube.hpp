@@ -76,17 +76,17 @@ namespace cube{
         glBindVertexArray(0);
     }
 
-    class Cube: public base{
+    class MyCube: public base{
     public:
-        Cube(){
+        MyCube(){
             genCube();
-            VBO = cube::VBO;
-            VAO = cube::VAO;
+            mVBO = cube::VBO;
+            mVAO = cube::VAO;
         }
-        Cube(unsigned int vao, unsigned int vbo):base(vao, vbo){
+        MyCube(unsigned int vao, unsigned int vbo):base(vao, vbo){
 
         }
-        ~Cube(){
+        ~MyCube(){
 
         }
     private:
