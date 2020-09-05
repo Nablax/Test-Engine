@@ -5,14 +5,12 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#define STB_IMAGE_IMPLEMENTATION
-#include <../gl_libs/stb_image.h>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
 #include "mesh.h"
-#include "shader.h"
+#include <../utils/shader.hpp>
 
 #include <string>
 #include <fstream>
