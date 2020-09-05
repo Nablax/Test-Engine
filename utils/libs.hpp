@@ -19,10 +19,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-namespace const_value{
+namespace constvalue{
     const double gravity = 9.8;
-    const glm::vec3 FRONT(0.0f, 0.0f, -1.0f);
-    const glm::vec3 WORLDUP(0.0f, 1.0f, 0.0f);
+    const glm::vec3 kFront(0.0f, 0.0f, -1.0f);
+    const glm::vec3 kWorldUp(0.0f, 1.0f, 0.0f);
+    const unsigned int kScreenWidth = 800;
+    const unsigned int kScreenHeight = 600;
 }
 
 #endif //TEST_LIBS_HPP

@@ -19,7 +19,7 @@ public:
     ~base(){
 
     }
-    virtual void render(Shader &s, glm::mat4 view, glm::mat4 projection, glm::mat4 model){
+    virtual void render(shader::MyShader &s, glm::mat4 view, glm::mat4 projection, glm::mat4 model){
         s.use();
         s.setMat4("view", view);
         s.setMat4("projection", projection);

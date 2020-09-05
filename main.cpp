@@ -9,13 +9,12 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+
 
 // camera
-Camera::MyCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-float lastX = (float)SCR_WIDTH / 2.0;
-float lastY = (float)SCR_HEIGHT / 2.0;
+camera::MyCamera my_camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float lastX = (float)constvalue::kScreenWidth / 2.0;
+float lastY = (float)constvalue::kScreenHeight / 2.0;
 bool firstMouse = true;
 
 // timing
@@ -33,7 +32,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(constvalue::kScreenWidth, constvalue::kScreenHeight, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -63,7 +62,7 @@ int main()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     skybox::Skybox skybox;
     cube::Cube cube1;
-    Shader cubeShader = Shader(cube::defaultVsPath, cube::defaultFsPath);
+    shader::MyShader cubeShader = shader::MyShader(cube::defaultVsPath, cube::defaultFsPath);
 
     float a = 9.8;
     float v = 0;
@@ -87,8 +86,10 @@ int main()
         glClearColor(0.5f, 0.7f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(Camera::ZOOM), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 view = my_camera.GetViewMatrix();
+        glm::mat4 projection =
+                glm::perspective(glm::radians(camera::kZoom), static_cast<float>(constvalue::kScreenWidth)
+                / static_cast<float>(constvalue::kScreenHeight), 0.1f, 100.0f);
         skybox.render(view, projection);
 
         glm::mat4 model = glm::mat4(1.0f);
@@ -120,13 +121,13 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(Camera::FORWARD, deltaTime);
+        my_camera.ProcessKeyboardInput(camera::kForward, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(Camera::BACKWARD, deltaTime);
+        my_camera.ProcessKeyboardInput(camera::kBackward, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(Camera::LEFT, deltaTime);
+        my_camera.ProcessKeyboardInput(camera::kLeft, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboardInput(Camera::RIGHT, deltaTime);
+        my_camera.ProcessKeyboardInput(camera::kRight, deltaTime);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -155,12 +156,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    my_camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(yoffset);
+    my_camera.ProcessMouseScroll(yoffset);
 }

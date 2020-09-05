@@ -70,7 +70,7 @@ namespace skybox{
 class Skybox: public base{
     public:
         explicit Skybox(std::vector<std::string> facePath = faces, const std::string& vsp = skybox::vsPath,
-               const std::string& fsp = skybox::fsPath):skyboxShader(Shader(vsp, fsp)){
+               const std::string& fsp = skybox::fsPath):skyboxShader(shader::MyShader(vsp, fsp)){
             skyboxTexture = TextureUtils::loadCubemap(std::move(facePath));
             skyboxShader.use();
             skyboxShader.setInt("skybox", 0);
@@ -103,7 +103,7 @@ class Skybox: public base{
         }
     private:
         unsigned int skyboxTexture;
-        Shader skyboxShader;
+        shader::MyShader skyboxShader;
     };
 }
 

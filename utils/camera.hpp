@@ -6,90 +6,86 @@
 
 #include "libs.hpp"
 
-namespace Camera{
+namespace camera{
 
-    const glm::vec3 FRONT(0.0f, 0.0f, -1.0f);
+    const float kYaw = -90.0f;
+    const float kPitch = 0.0f;
+    const float kSpeed = 2.5f;
+    const float kSensitivity = 0.1f;
+    const float kZoom = 45.0f;
+    const float kZoomMin = 1.0f;
+    const float kZoomMax = 45.0f;
 
-    const glm::vec3 POSITION = glm::vec3(0.0f);
-
-    const float YAW = -90.0f;
-    const float PITCH = 0.0f;
-    const float SPEED = 2.5f;
-    const float SENSITIVITY = 0.1f;
-    const float ZOOM = 45.0f;
-    const float ZOOMMIN = 1.0f;
-    const float ZOOMMAX = 45.0f;
-
-    enum Camera_Direction {
-        FORWARD,
-        BACKWARD,
-        LEFT,
-        RIGHT
+    enum CameraDirection {
+        kForward,
+        kBackward,
+        kLeft,
+        kRight
     };
 
     class MyCamera {
     public:
-        MyCamera(glm::vec3 position, glm::vec3 worldup = const_value::WORLDUP, float yaw=YAW, float pitch=PITCH)
-                : Front(Camera::FRONT), CameraSpeed(Camera::SPEED), MouseSensitivity(Camera::SENSITIVITY), Zoom(Camera::ZOOM){
-            Position = position;
-            WorldUp = worldup;
-            Yaw = yaw;
-            Pitch = pitch;
+        MyCamera(glm::vec3 position, glm::vec3 worldUp = constvalue::kWorldUp, float yaw=kYaw, float pitch=kPitch)
+                : mFront(constvalue::kFront), mCameraSpeed(camera::kSpeed), mMouseSensitivity(camera::kSensitivity), mZoom(camera::kZoom){
+            mPosition = position;
+            mWorldUp = worldUp;
+            mYaw = yaw;
+            mPitch = pitch;
             updateCamera();
         }
         glm::mat4 GetViewMatrix() {
-            return glm::lookAt(Position, Position + Front, Up);
+            return glm::lookAt(mPosition, mPosition + mFront, mUp);
         }
-        void ProcessKeyboardInput(Camera::Camera_Direction dir, float time) {
-            float shift = CameraSpeed * time;
+        void ProcessKeyboardInput(camera::CameraDirection dir, float time) {
+            float shift = mCameraSpeed * time;
             switch (dir) {
-                case FORWARD:
-                    Position += Front * shift;
+                case kForward:
+                    mPosition += mFront * shift;
                     break;
-                case BACKWARD:
-                    Position -= Front * shift;
+                case kBackward:
+                    mPosition -= mFront * shift;
                     break;
-                case LEFT:
-                    Position -= Right * shift;
+                case kLeft:
+                    mPosition -= mRight * shift;
                     break;
-                case RIGHT:
-                    Position += Right * shift;
+                case kRight:
+                    mPosition += mRight * shift;
                     break;
             }
         }
         void ProcessMouseMovement(float offsetX, float offsetY, GLboolean noFlip=true) {
-            Yaw += offsetX * MouseSensitivity;
-            Pitch += offsetY * MouseSensitivity;
+            mYaw += offsetX * mMouseSensitivity;
+            mPitch += offsetY * mMouseSensitivity;
             if (noFlip)
             {
-                if (Pitch > 89.0f)
-                    Pitch = 89.0f;
-                if (Pitch < -89.0f)
-                    Pitch = -89.0f;
+                if (mPitch > 89.0f)
+                    mPitch = 89.0f;
+                if (mPitch < -89.0f)
+                    mPitch = -89.0f;
             }
             updateCamera();
         }
         void ProcessMouseScroll(float offsetY) {
-            Zoom -= offsetY;
-            if (Zoom < ZOOMMIN)
-                Zoom = ZOOMMIN;
-            if (Zoom > ZOOMMAX)
-                Zoom = ZOOMMAX;
+            mZoom -= offsetY;
+            if (mZoom < kZoomMin)
+                mZoom = kZoomMin;
+            if (mZoom > kZoomMax)
+                mZoom = kZoomMax;
         }
 
     private:
-        glm::vec3 Position, Front, Up, Right;
-        glm::vec3 WorldUp;
-        float Yaw, Pitch;
-        float CameraSpeed, MouseSensitivity, Zoom;
+        glm::vec3 mPosition, mFront, mUp, mRight;
+        glm::vec3 mWorldUp;
+        float mYaw, mPitch;
+        float mCameraSpeed, mMouseSensitivity, mZoom;
         void updateCamera() {
             glm::vec3 newFront;
-            newFront.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-            newFront.y = sin(glm::radians(Pitch));
-            newFront.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-            Front = glm::normalize(newFront);
-            Right = glm::normalize(glm::cross(Front, WorldUp));
-            Up = glm::normalize(glm::cross(Right, Front));
+            newFront.x = cos(glm::radians(mYaw)) * cos(glm::radians(mPitch));
+            newFront.y = sin(glm::radians(mPitch));
+            newFront.z = sin(glm::radians(mYaw)) * cos(glm::radians(mPitch));
+            mFront = glm::normalize(newFront);
+            mRight = glm::normalize(glm::cross(mFront, mWorldUp));
+            mUp = glm::normalize(glm::cross(mRight, mFront));
         }
     };
 }
