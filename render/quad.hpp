@@ -10,7 +10,7 @@
 #include <base.hpp>
 
 namespace quad{
-    float planeVertices[] = {
+    float kPlaneVertices[] = {
             // positions            // normals         // texcoords
             10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
             -10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
@@ -21,10 +21,10 @@ namespace quad{
             10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,  10.0f, 10.0f
     };
 
-    const std::string defaultVsPath = "../shader/plane.vs";
-    const std::string defaultFsPath = "../shader/plane.fs";
-    const std::string defaultTexture = "../texture/wood.png";
-
+    const std::string kDefaultVsPath = "../shader/plane.vs";
+    const std::string kDefaultFsPath = "../shader/plane.fs";
+    const std::string kDefaultTexture = "../texture/wood.png";
+    const unsigned int kQuadTriangle = 6;
     unsigned int VAO = 0, VBO = 0;
 
     void genQuad(){
@@ -34,7 +34,7 @@ namespace quad{
         glGenBuffers(1, &VBO);
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(kPlaneVertices), kPlaneVertices, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(1);
@@ -48,9 +48,10 @@ namespace quad{
     public:
         MyQuad(){
             genQuad();
-            mVAO = VAO;
-            mVBO = VBO;
-            textureID = textureutils::loadTexture(defaultTexture);
+            mVAO = quad::VAO;
+            mVBO = quad::VBO;
+            mTexture = textureutils::loadTexture(kDefaultTexture);
+            mNumTriangle = kQuadTriangle;
         }
         MyQuad(unsigned int vao, unsigned int vbo, unsigned int textureid = 0): base(vao, vbo), textureID(textureid){
 

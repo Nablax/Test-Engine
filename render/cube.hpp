@@ -10,7 +10,7 @@
 #include "base.hpp"
 
 namespace cube{
-    float vertices[] = {
+    float kVertices[] = {
             // back face
             -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
@@ -55,9 +55,11 @@ namespace cube{
             -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left
     };
 
-    const std::string defaultVsPath = "../shader/cube.vs";
-    const std::string defaultFsPath = "../shader/cube.fs";
-    const std::string defaultTexture = "../texture/container.jpg";
+    const unsigned int kCubeTriangle = 36;
+
+    const std::string kDefaultVsPath = "../shader/cube.vs";
+    const std::string kDefaultFsPath = "../shader/cube.fs";
+    const std::string kDefaultTexture = "../texture/container.jpg";
 
     unsigned int VAO = 0, VBO = 0;
 
@@ -67,7 +69,7 @@ namespace cube{
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(kVertices), kVertices, GL_STATIC_DRAW);
         glBindVertexArray(VAO);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -82,6 +84,7 @@ namespace cube{
             genCube();
             mVBO = cube::VBO;
             mVAO = cube::VAO;
+            mNumTriangle = cube::kCubeTriangle;
         }
         MyCube(unsigned int vao, unsigned int vbo):base(vao, vbo){
 

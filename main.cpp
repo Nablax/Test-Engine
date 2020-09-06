@@ -62,7 +62,7 @@ int main()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     skybox::Skybox skybox;
     cube::MyCube cube1;
-    shader::MyShader cubeShader = shader::MyShader(cube::defaultVsPath, cube::defaultFsPath);
+    shader::MyShader cubeShader = shader::MyShader(cube::kDefaultVsPath, cube::kDefaultFsPath);
 
     float a = 9.8;
     float v = 0;
