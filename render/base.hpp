@@ -13,6 +13,10 @@ public:
     explicit base(const std::shared_ptr<shader::MyShader> &inShader){linkShader(inShader);};
     virtual ~base() = default;
     virtual void render(glm::mat4 &view, glm::mat4 &projection, glm::mat4 &model){
+        if(!mShader){
+            std::cerr << "Shader not linked, using linkShader()!" << std::endl;
+            return;
+        }
         mShader->use();
         mShader->setMat4("view", view);
         mShader->setMat4("projection", projection);
