@@ -63,10 +63,12 @@ int main()
 
     std::shared_ptr<shader::MyShader> cubeShader = std::make_shared<shader::MyShader>(cube::kDefaultVsPath, cube::kDefaultFsPath);
     //shader::MyShader cubeShader = shader::MyShader(cube::kDefaultVsPath, cube::kDefaultFsPath);
+    cube.linkShader(cubeShader);
 
     quad::MyQuad ground;
     std::shared_ptr<shader::MyShader> quadShader = std::make_shared<shader::MyShader>(quad::kDefaultVsPath, quad::kDefaultFsPath);
     //shader::MyShader quadShader = shader::MyShader(quad::kDefaultVsPath, quad::kDefaultFsPath);
+    ground.linkShader(quadShader);
     quadShader->setInt("floorTexture", 0);
 
     float a = 9.8;
@@ -106,11 +108,11 @@ int main()
             v *= -1;
         model = glm::translate(model, glm::vec3(-1.0f, 0.0f - path, -1.0f));
         model = glm::scale(model, glm::vec3(0.1));
-        cube.render(cubeShader, view, projection, model);
+        cube.render(view, projection, model);
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f - floor, -1.0f));
-        ground.render(quadShader, view, projection, model);
+        ground.render(view, projection, model);
 
 
         glfwSwapBuffers(window);
