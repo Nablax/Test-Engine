@@ -89,6 +89,7 @@ namespace cube{
         MyCube(unsigned int vao, unsigned int vbo):base(vao, vbo){
 
         }
+        explicit MyCube(const std::shared_ptr<shader::MyShader> &inShader):base(inShader){}
         ~MyCube(){
 
         }

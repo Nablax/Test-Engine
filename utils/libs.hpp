@@ -19,6 +19,7 @@
 #include <string>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <memory>
 
 namespace constvalue{
     const double gravity = 9.8;

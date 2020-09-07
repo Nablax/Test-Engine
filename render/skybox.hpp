@@ -70,11 +70,12 @@ namespace skybox{
 class Skybox: public base{
     public:
         explicit Skybox(std::vector<std::string> facePath = kFaces, const std::string& vsp = skybox::kVsPath,
-               const std::string& fsp = skybox::kFsPath):skyboxShader(shader::MyShader(vsp, fsp)){
+               const std::string& fsp = skybox::kFsPath){
             mTexture = textureutils::loadCubemap(std::move(facePath));
             mNumTriangle = skybox::kSkyboxTriangle;
-            skyboxShader.use();
-            skyboxShader.setInt("skybox", 0);
+            mShader = std::make_shared<shader::MyShader>(vsp, fsp);
+            mShader->use();
+            mShader->setInt("skybox", 0);
             activateSkyboxTexture(0, mTexture);
             glGenVertexArrays(1, &mVAO);
             glGenBuffers(1, &mVBO);
@@ -87,9 +88,9 @@ class Skybox: public base{
         virtual ~Skybox() = default;
         void render(glm::mat4 view, glm::mat4 projection){
             glDepthFunc(GL_LEQUAL);
-            skyboxShader.use();
-            skyboxShader.setMat4("view", glm::mat4(glm::mat3(view)));
-            skyboxShader.setMat4("projection", projection);
+            mShader->use();
+            mShader->setMat4("view", glm::mat4(glm::mat3(view)));
+            mShader->setMat4("projection", projection);
             glBindVertexArray(mVAO);
             glDrawArrays(GL_TRIANGLES, 0, mNumTriangle);
             glBindVertexArray(0);
@@ -100,7 +101,7 @@ class Skybox: public base{
             glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
         }
     private:
-        shader::MyShader skyboxShader;
+
     };
 }
 

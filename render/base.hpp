@@ -10,6 +10,7 @@ class base{
 public:
     base()=default;
     base(unsigned int vao, unsigned int vbo):mVAO(vao), mVBO(vbo){}
+    explicit base(const std::shared_ptr<shader::MyShader> &inShader){linkShader(inShader);};
     virtual ~base() = default;
     virtual void render(shader::MyShader &s, glm::mat4 &view, glm::mat4 &projection, glm::mat4 &model){
         s.use();
@@ -22,6 +23,11 @@ public:
         }
         glDrawArrays(GL_TRIANGLES, 0, mNumTriangle);
         glBindVertexArray(0);
+    }
+
+    void linkShader(const std::shared_ptr<shader::MyShader> &inShader){
+        mShader = inShader;
+        std::cout<<"shader linked" << std::endl;
     }
 
     void loadTexture(const std::string& path){
@@ -45,6 +51,7 @@ public:
 
 protected:
     unsigned int mVAO, mVBO, mTexture=0, mNumTriangle;
+    std::shared_ptr<shader::MyShader> mShader= nullptr;
 };
 
 #endif //TEST_BASE_HPP

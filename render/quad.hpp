@@ -53,6 +53,7 @@ namespace quad{
             mTexture = textureutils::loadTexture(kDefaultTexture);
             mNumTriangle = kQuadTriangle;
         }
+        explicit MyQuad(const std::shared_ptr<shader::MyShader> &inShader):base(inShader){mShader->setInt("floorTexture", 0);}
         MyQuad(unsigned int vao, unsigned int vbo, unsigned int textureid = 0): base(vao, vbo), textureID(textureid){
 
         }
