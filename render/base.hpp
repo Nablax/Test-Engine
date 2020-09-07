@@ -12,11 +12,11 @@ public:
     base(unsigned int vao, unsigned int vbo):mVAO(vao), mVBO(vbo){}
     explicit base(const std::shared_ptr<shader::MyShader> &inShader){linkShader(inShader);};
     virtual ~base() = default;
-    virtual void render(shader::MyShader &s, glm::mat4 &view, glm::mat4 &projection, glm::mat4 &model){
-        s.use();
-        s.setMat4("view", view);
-        s.setMat4("projection", projection);
-        s.setMat4("model", model);
+    virtual void render(const std::shared_ptr<shader::MyShader> &s, glm::mat4 &view, glm::mat4 &projection, glm::mat4 &model){
+        s->use();
+        s->setMat4("view", view);
+        s->setMat4("projection", projection);
+        s->setMat4("model", model);
         glBindVertexArray(mVAO);
         if(mTexture){
             activate2DTexture(0, mTexture);

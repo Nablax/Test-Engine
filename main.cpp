@@ -60,11 +60,14 @@ int main()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     skybox::Skybox skybox;
     cube::MyCube cube;
-    shader::MyShader cubeShader = shader::MyShader(cube::kDefaultVsPath, cube::kDefaultFsPath);
+
+    std::shared_ptr<shader::MyShader> cubeShader = std::make_shared<shader::MyShader>(cube::kDefaultVsPath, cube::kDefaultFsPath);
+    //shader::MyShader cubeShader = shader::MyShader(cube::kDefaultVsPath, cube::kDefaultFsPath);
 
     quad::MyQuad ground;
-    shader::MyShader quadShader = shader::MyShader(quad::kDefaultVsPath, quad::kDefaultFsPath);
-    quadShader.setInt("floorTexture", 0);
+    std::shared_ptr<shader::MyShader> quadShader = std::make_shared<shader::MyShader>(quad::kDefaultVsPath, quad::kDefaultFsPath);
+    //shader::MyShader quadShader = shader::MyShader(quad::kDefaultVsPath, quad::kDefaultFsPath);
+    quadShader->setInt("floorTexture", 0);
 
     float a = 9.8;
     float v = 0;
