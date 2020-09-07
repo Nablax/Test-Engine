@@ -1,10 +1,16 @@
 #version 330 core
-out vec4 FragColor
+out vec4 FragColor;
 
-in vec3 TexCoords;
+in VS_OUT {
+    vec3 FragPos;
+    vec3 Normal;
+    vec2 TexCoords;
+} fs_in;
 
-uniform sample2D quadTexture;
+uniform sampler2D floorTexture;
 
-void main(){
-    FragColor = texture(quadTexture, TexCoords);
+void main()
+{
+    vec3 color = texture(floorTexture, fs_in.TexCoords).rgb;
+    FragColor = vec4(color, 1.0);
 }

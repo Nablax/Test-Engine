@@ -1,15 +1,13 @@
 #include "camera.hpp"
 #include "skybox.hpp"
 #include "cube.hpp"
+#include "quad.hpp"
 #include "libs.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-
-// settings
-
 
 // camera
 camera::MyCamera my_camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -61,13 +59,17 @@ int main()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     skybox::Skybox skybox;
-    cube::MyCube cube1;
+    cube::MyCube cube;
     shader::MyShader cubeShader = shader::MyShader(cube::kDefaultVsPath, cube::kDefaultFsPath);
+
+    quad::MyQuad ground;
+    shader::MyShader quadShader = shader::MyShader(quad::kDefaultVsPath, quad::kDefaultFsPath);
+    quadShader.setInt("floorTexture", 0);
 
     float a = 9.8;
     float v = 0;
-    float path = 0;
-    float floor = 20;
+    float path = -5;
+    float floor = 10;
 
     // render loop
     // -----------
@@ -90,22 +92,24 @@ int main()
         glm::mat4 projection =
                 glm::perspective(glm::radians(camera::kZoom), static_cast<float>(constvalue::kScreenWidth)
                 / static_cast<float>(constvalue::kScreenHeight), 0.1f, 100.0f);
+
+
         skybox.render(view, projection);
 
         glm::mat4 model = glm::mat4(1.0f);
-
         v += a * deltaTime;
-        path += v * deltaTime;
-
-        if(path > floor)
+        path += v * deltaTime / 2;
+        if(path > floor + 1)
             v *= -1;
-
         model = glm::translate(model, glm::vec3(-1.0f, 0.0f - path, -1.0f));
-        model = glm::scale(model, glm::vec3(0.5));
-        cube1.render(cubeShader, view, projection, model);
+        model = glm::scale(model, glm::vec3(0.1));
+        cube.render(cubeShader, view, projection, model);
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f - floor, -1.0f));
+        ground.render(quadShader, view, projection, model);
+
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -113,13 +117,10 @@ int main()
     return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         my_camera.ProcessKeyboardInput(camera::kForward, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
