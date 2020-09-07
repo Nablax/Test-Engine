@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "camera.hpp"
 #include "skybox.hpp"
 #include "cube.hpp"
@@ -44,9 +46,6 @@ int main()
 
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -59,17 +58,8 @@ int main()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     skybox::Skybox skybox;
-    cube::MyCube cube;
-
-    std::shared_ptr<shader::MyShader> cubeShader = std::make_shared<shader::MyShader>(cube::kDefaultVsPath, cube::kDefaultFsPath);
-    //shader::MyShader cubeShader = shader::MyShader(cube::kDefaultVsPath, cube::kDefaultFsPath);
-    cube.linkShader(cubeShader);
-
-    quad::MyQuad ground;
-    std::shared_ptr<shader::MyShader> quadShader = std::make_shared<shader::MyShader>(quad::kDefaultVsPath, quad::kDefaultFsPath);
-    //shader::MyShader quadShader = shader::MyShader(quad::kDefaultVsPath, quad::kDefaultFsPath);
-    ground.linkShader(quadShader);
-    quadShader->setInt("floorTexture", 0);
+    cube::MyCube cube(std::make_shared<shader::MyShader>(cube::kDefaultVsPath, cube::kDefaultFsPath));
+    quad::MyQuad ground(std::make_shared<shader::MyShader>(quad::kDefaultVsPath, quad::kDefaultFsPath));
 
     float a = 9.8;
     float v = 0;

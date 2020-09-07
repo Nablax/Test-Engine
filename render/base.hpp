@@ -26,6 +26,10 @@ public:
     }
 
     void linkShader(const std::shared_ptr<shader::MyShader> &inShader){
+        if(!inShader){
+            std::cerr << "link failed" << std::endl;
+            return;
+        }
         mShader = inShader;
         //std::cout<<"shader linked" << std::endl;
     }
