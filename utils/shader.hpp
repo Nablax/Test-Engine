@@ -7,7 +7,8 @@ namespace shader{
     {
     public:
         unsigned int ID;
-        MyShader(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath = "")
+        MyShader(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath = ""
+                ,const char* varying[] = nullptr, const int varyingCount = 0)
         {
             std::string vertexCode, fragmentCode, geometryCode;
             std::ifstream vShaderFile, fShaderFile, gShaderFile;
@@ -70,6 +71,8 @@ namespace shader{
             glAttachShader(ID, fragment);
             if(!geometryPath.empty())
                 glAttachShader(ID, geometry);
+            if (varying)
+                glTransformFeedbackVaryings(ID, varyingCount, varying, GL_INTERLEAVED_ATTRIBS);
             glLinkProgram(ID);
             checkCompileErrors(ID, "PROGRAM");
 

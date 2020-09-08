@@ -7,16 +7,16 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <../gl_libs/stb_image.h>
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <vector>
 #include <unordered_map>
-#include <string>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <memory>
