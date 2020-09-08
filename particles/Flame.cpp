@@ -1,3 +1,5 @@
+#ifndef FL
+#define FL
 #include "Flame.h"
 
 namespace Flame{
@@ -133,7 +135,6 @@ namespace Flame{
     void Flame::RenderParticles(glm::mat4& worldMatrix,
                                 glm::mat4& viewMatrix, glm::mat4& projectMatrix)
     {
-        glEnable(GL_POINT_SPRITE);
         glEnable(GL_PROGRAM_POINT_SIZE);
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
@@ -218,3 +219,4 @@ namespace Flame{
         }
     }
 }
+#endif

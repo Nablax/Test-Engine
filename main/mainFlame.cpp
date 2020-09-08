@@ -1,137 +1,122 @@
-#include <memory>
+//#define GLEW_STATIC
+//#pragma comment(lib,"glew.lib")
 
-#include "camera.hpp"
-#include "skybox.hpp"
-#include "cube.hpp"
-#include "quad.hpp"
-#include "sphere.hpp"
-#include "libs.hpp"
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <fstream>
+#include <glm/glm.hpp>
+#include <string>
+#include "Flame.h"
+#include <GLFW/glfw3.h>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xPos, double yPos);
-void scroll_callback(GLFWwindow* window, double xOffset, double yOffset);
-void processInput(GLFWwindow *window);
+void key_callback(GLFWwindow* window,int key, int scancode,int action,int mode);
+void do_movement();
+void mouse_callback(GLFWwindow* window,double xpos,double ypos);
+void scroll_callback(GLFWwindow* window,double xoffset,double yoffset);
 
-// camera
-camera::MyCamera myCamera(glm::vec3(0.0f, 0.0f, 3.0f));
+GLfloat screenWidth = 1600;
+GLfloat screenHeight = 1000;
+camera::MyCamera myCamera(glm::vec3(0.0f,8.0f,25.0f));
+bool keys[1024];
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
+GLfloat lastX = 400,lastY = 300;
 bool firstMouse = true;
+std::string str_fps;
+char c[8];
+int FrameRate = 0;
+int FrameCount = 0;
+int timeLeft = 0;
 
-// timing
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
 
-double lastMouseX, lastMouseY;
-
-int main()
-{
+int main(){
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    GLFWwindow* window = glfwCreateWindow(constvalue::kScreenWidth, constvalue::kScreenHeight, "LearnOpenGL", NULL, NULL);
-    if (window == NULL)
-    {
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE,GL_FALSE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
+
+    GLFWwindow* window = glfwCreateWindow(screenWidth,screenHeight,"Learn OpenGL",NULL,NULL);
+    if(window == NULL){
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
+
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window,mouse_callback);
+    glfwSetScrollCallback(window,scroll_callback);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glewExperimental = GL_TRUE;
+    if(glewInit() != GLEW_OK){
+        std::cout << "Failed to initialize GLEW" << std::endl;
         return -1;
     }
-
+    glViewport(0,0,screenWidth,screenHeight);
+    Flame::Flame flame;
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    skybox::Skybox skybox;
-    sphere::MySphere sphere(std::make_shared<shader::MyShader>(sphere::kDefaultVsPath, sphere::kDefaultFsPath));
-    quad::MyQuad ground(std::make_shared<shader::MyShader>(quad::kDefaultVsPath, quad::kDefaultFsPath));
+    glDepthFunc(GL_LEQUAL);
+    while(!glfwWindowShouldClose(window)){
+        glfwPollEvents();
+        do_movement();
+        //render
+        glClearColor(0.0,0.0,0.0,1.0);
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    float a = 9.8;
-    float v = 0;
-    float path = -5;
-    float floor = 10;
+        glm::mat4 projection(1.0f);
+        glm::mat4 model(1.0f);
+        glm::mat4 view = myCamera.GetViewMatrix();
+        projection = glm::perspective(glm::radians(45.0f),screenWidth/screenHeight,0.1f,2000.f);
+        flame.Render(deltaTime, model, view, projection);
 
-    // render loop
-    // -----------
-    while (!glfwWindowShouldClose(window))
-    {
-        float currentFrame = glfwGetTime();
+        GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        processInput(window);
-        glClearColor(0.5f, 0.7f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glm::mat4 view = myCamera.GetViewMatrix();
-        glm::mat4 projection =
-                glm::perspective(glm::radians(camera::kZoom), static_cast<float>(constvalue::kScreenWidth)
-                                                              / static_cast<float>(constvalue::kScreenHeight), 0.1f, 100.0f);
-
-
-        skybox.render(view, projection);
-
-        glm::mat4 model = glm::mat4(1.0f);
-        v += a * deltaTime;
-        path += v * deltaTime / 2;
-        if(path > floor + 1)
-            v *= -1;
-        model = glm::translate(model, glm::vec3(-1.0f, 0.0f - path, -1.0f));
-        model = glm::scale(model, glm::vec3(0.1));
-        sphere.render(view, projection, model);
-
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f - floor, -1.0f));
-        ground.render(view, projection, model);
-
-
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
     glfwTerminate();
+
     return 0;
 }
 
-void processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        myCamera.ProcessKeyboardInput(camera::kForward, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        myCamera.ProcessKeyboardInput(camera::kBackward, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        myCamera.ProcessKeyboardInput(camera::kLeft, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        myCamera.ProcessKeyboardInput(camera::kRight, deltaTime);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode){
+    if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window,GL_TRUE);
+    if(action == GLFW_PRESS)
+        keys[key] = true;
+    else if(action == GLFW_RELEASE)
+        keys[key] = false;
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
+void do_movement(){
+    GLfloat cameraSpeed = 5.0f*deltaTime;
+    if(keys[GLFW_KEY_W])
+        myCamera.ProcessKeyboardInput(camera::kForward,deltaTime);
+    if(keys[GLFW_KEY_S])
+        myCamera.ProcessKeyboardInput(camera::kBackward,deltaTime);
+    if(keys[GLFW_KEY_A])
+        myCamera.ProcessKeyboardInput(camera::kLeft,deltaTime);
+    if(keys[GLFW_KEY_D])
+        myCamera.ProcessKeyboardInput(camera::kRight,deltaTime);
 }
 
-void mouse_callback(GLFWwindow* window, double xPos, double yPos)
-{
-    if (firstMouse)
-    {
-        lastMouseX = xPos;
-        lastMouseY = yPos;
+void mouse_callback(GLFWwindow* window,double xpos,double ypos){
+    if(firstMouse){
+        lastX = xpos;
+        lastY = ypos;
         firstMouse = false;
     }
-    myCamera.ProcessMouseMovement(xPos - lastMouseX, lastMouseY - yPos);
-    lastMouseX = xPos;
-    lastMouseY = yPos;
+    GLfloat xoffset = xpos - lastX;
+    GLfloat yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+    myCamera.ProcessMouseMovement(xoffset,yoffset);
 }
 
-
-void scroll_callback(GLFWwindow* window, double xOffset, double yOffset)
-{
-    myCamera.ProcessMouseScroll(yOffset);
+void scroll_callback(GLFWwindow* window,double xoffset,double yoffset){
+    myCamera.ProcessMouseScroll(yoffset);
 }
