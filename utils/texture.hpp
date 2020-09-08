@@ -5,6 +5,9 @@
 #ifndef TEST_TEXTURE_HPP
 #define TEST_TEXTURE_HPP
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <../gl_libs/stb_image.h>
+
 #include "libs.hpp"
 
 namespace textureutils{

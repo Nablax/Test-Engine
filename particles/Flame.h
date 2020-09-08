@@ -2,7 +2,6 @@
 #ifndef TEST_FLAME_HPP
 #define TEST_FLAME_HPP
 #include "camera.hpp"
-#include "texture.hpp"
 #include "shader.hpp"
 
 namespace Flame {

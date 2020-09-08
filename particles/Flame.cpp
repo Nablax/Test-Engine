@@ -1,7 +1,7 @@
 #ifndef FL
 #define FL
 #include "Flame.h"
-
+#include "texture.hpp"
 namespace Flame{
 
     Flame::Flame()
@@ -16,15 +16,15 @@ namespace Flame{
                                       "Alpha1","Size1",
                                       "Life1"
         };//设置TransformFeedback要捕获的输出变量
-        mUpdateShader = new shader::MyShader("shader/Update.vs", "shader/Update.fs",
-                                   "shader/Update.gs", varyings, 7);
+        mUpdateShader = new shader::MyShader("../test_shader/Update.vs", "../test_shader/Update.fs",
+                                   "../test_shader/Update.gs", varyings, 7);
         //设置TransformFeedback缓存能够记录的顶点的数据类型
 
-        mRenderShader = new shader::MyShader("shader/Render.vs", "shader/Render.fs");
+        mRenderShader = new shader::MyShader("../test_shader/Render.vs", "../test_shader/Render.fs");
         //设置随机纹理
         InitRandomTexture(580);
-        mSparkTexture = textureutils::loadTexture("texture/particle.bmp");
-        mStartTexture = textureutils::loadTexture("texture/flame.bmp");
+        mSparkTexture = textureutils::loadTexture("../texture/particle.bmp");
+        mStartTexture = textureutils::loadTexture("../texture/flame.bmp");
         mRenderShader->use();
         mRenderShader->setInt("flameSpark", 0);
         mRenderShader->setInt("flameStart", 1);

@@ -5,9 +5,6 @@
 #ifndef TEST_LIBS_HPP
 #define TEST_LIBS_HPP
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <../gl_libs/stb_image.h>
-
 #include <string>
 #include <fstream>
 #include <sstream>
