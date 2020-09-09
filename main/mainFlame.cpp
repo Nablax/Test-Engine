@@ -7,8 +7,9 @@
 #include <fstream>
 #include <glm/glm.hpp>
 #include <string>
-#include "Flame.h"
+#include "Flame.hpp"
 #include <GLFW/glfw3.h>
+#include "skybox.hpp"
 
 void key_callback(GLFWwindow* window,int key, int scancode,int action,int mode);
 void do_movement();
@@ -59,6 +60,12 @@ int main(){
     Flame::Flame flame;
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
+    skybox::Skybox skybox;
+
     while(!glfwWindowShouldClose(window)){
         glfwPollEvents();
         do_movement();
@@ -71,6 +78,7 @@ int main(){
         glm::mat4 view = myCamera.GetViewMatrix();
         projection = glm::perspective(glm::radians(45.0f),screenWidth/screenHeight,0.1f,2000.f);
         flame.Render(deltaTime, model, view, projection);
+        skybox.render(view, projection);
 
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
