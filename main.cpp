@@ -73,9 +73,6 @@ int main()
                 glm::perspective(glm::radians(camera::kZoom), static_cast<float>(constvalue::kScreenWidth)
                 / static_cast<float>(constvalue::kScreenHeight), 0.1f, 100.0f);
 
-
-        skybox.render(projection, view);
-
         glm::mat4 model = glm::mat4(1.0f);
         v += a * deltaTime;
         path += v * deltaTime / 2;
@@ -89,6 +86,7 @@ int main()
         model = glm::translate(model, glm::vec3(0.0f, 0.0f - floor, -1.0f));
         ground.render(projection, view, model);
 
+        skybox.render(projection, view);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
