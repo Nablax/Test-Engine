@@ -71,7 +71,7 @@ int main()
         glm::mat4 view = myCamera.GetViewMatrix();
         glm::mat4 projection =
                 glm::perspective(glm::radians(camera::kZoom), static_cast<float>(constvalue::kScreenWidth)
-                / static_cast<float>(constvalue::kScreenHeight), 0.1f, 100.0f);
+                / static_cast<float>(constvalue::kScreenHeight), 0.1f, 1000.0f);
 
         glm::mat4 model = glm::mat4(1.0f);
         v += a * deltaTime;
