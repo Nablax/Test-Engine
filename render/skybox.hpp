@@ -86,7 +86,7 @@ class Skybox: public base{
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         }
         virtual ~Skybox() = default;
-        void render(glm::mat4 view, glm::mat4 projection){
+        void render(glm::mat4 &projection, glm::mat4 &view){
             glDepthFunc(GL_LEQUAL);
             mShader->use();
             mShader->setMat4("view", glm::mat4(glm::mat3(view)));

@@ -10,6 +10,7 @@
 #include "Flame.hpp"
 #include <GLFW/glfw3.h>
 #include "skybox.hpp"
+#include "quad.hpp"
 
 void key_callback(GLFWwindow* window,int key, int scancode,int action,int mode);
 void do_movement();
@@ -59,12 +60,14 @@ int main(){
     glViewport(0,0,screenWidth,screenHeight);
     Flame::Flame flame;
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+//    glEnable(GL_CULL_FACE);
+//    glCullFace(GL_BACK);
 
     skybox::Skybox skybox;
+    quad::MyQuad ground(std::make_shared<shader::MyShader>(quad::kDefaultVsPath, quad::kDefaultFsPath));
 
     while(!glfwWindowShouldClose(window)){
         glfwPollEvents();
@@ -73,12 +76,18 @@ int main(){
         glClearColor(0.0,0.0,0.0,1.0);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 projection(1.0f);
         glm::mat4 model(1.0f);
         glm::mat4 view = myCamera.GetViewMatrix();
-        projection = glm::perspective(glm::radians(45.0f),screenWidth/screenHeight,0.1f,2000.f);
+        glm::mat4 projection =
+                glm::perspective(glm::radians(camera::kZoom), static_cast<float>(constvalue::kScreenWidth)
+                                                              / static_cast<float>(constvalue::kScreenHeight), 0.1f, 100.0f);
         flame.Render(deltaTime, model, view, projection);
-        skybox.render(view, projection);
+        skybox.render(projection, view);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 10.0f, -1.0f));
+        model = glm::scale(model, glm::vec3(10.0f));
+        ground.render(projection, view, model);
 
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;

@@ -18,18 +18,18 @@ namespace particle{
         float life;
     };
     class Particle{
-    private:
+    protected:
         unsigned int mCurVBOIndex, mCurTransformFeedbackIndex;
-        GLuint mParticleBuffers[2]; //粒子发射系统的两个顶点缓存区
+        GLuint mParticleBuffers[2];
         GLuint mParticleArrays[2];
-        GLuint mTransformFeedbacks[2];//粒子发射系统对应的TransformFeedback
-        GLuint mRandomTexture;//随机一维纹理
-        unsigned mSparkTexture;//Alpha纹理
+        GLuint mTransformFeedbacks[2];
+        GLuint mRandomTexture;
+        unsigned mSparkTexture;
         unsigned mStartTexture;
-        float mTimer;//粒子发射器已经发射的时间
+        float mTimer;
         bool mFirst;
-        shader::MyShader* mUpdateShader;//更新粒子的GPUProgram
-        shader::MyShader* mRenderShader;//渲染粒子的GPUProgram
+        shader::MyShader* mUpdateShader;
+        shader::MyShader* mRenderShader;
     };
 }
 

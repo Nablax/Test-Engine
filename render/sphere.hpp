@@ -110,7 +110,7 @@ namespace sphere{
             mNumTriangle = sphere::sphereTriangle;
         }
         explicit MySphere(const std::shared_ptr<shader::MyShader> &inShader):MySphere(){linkShader(inShader);}
-        void render(glm::mat4 &view, glm::mat4 &projection, glm::mat4 &model) override{
+        void render(glm::mat4 &projection, glm::mat4 &view, glm::mat4 &model) override{
             if(!mShader){
                 std::cerr << "Shader not linked, using linkShader()!" << std::endl;
                 return;

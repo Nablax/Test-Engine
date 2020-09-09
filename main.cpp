@@ -74,7 +74,7 @@ int main()
                 / static_cast<float>(constvalue::kScreenHeight), 0.1f, 100.0f);
 
 
-        skybox.render(view, projection);
+        skybox.render(projection, view);
 
         glm::mat4 model = glm::mat4(1.0f);
         v += a * deltaTime;
@@ -83,11 +83,11 @@ int main()
             v *= -1;
         model = glm::translate(model, glm::vec3(-1.0f, 0.0f - path, -1.0f));
         model = glm::scale(model, glm::vec3(0.1));
-        sphere.render(view, projection, model);
+        sphere.render(projection, view, model);
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f - floor, -1.0f));
-        ground.render(view, projection, model);
+        ground.render(projection, view, model);
 
 
         glfwSwapBuffers(window);

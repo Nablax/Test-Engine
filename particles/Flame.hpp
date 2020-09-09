@@ -4,6 +4,7 @@
 #include "camera.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
+#include "particle_base.hpp"
 namespace Flame {
 #define PARTICLE_TYPE_LAUNCHER 0.0f
 #define PARTICLE_TYPE_SHELL 1.0f
@@ -27,18 +28,12 @@ namespace Flame {
     const glm::vec3 center(0.0f);
     const float r = 0.3f;
 
-    struct FlameParticle
+    struct FlameParticle: particle::ParticleAttribute
     {
-        float type;
-        glm::vec3 position;
-        glm::vec3 velocity;
-        float lifetimeMills;//年龄
-        float alpha;//alpha通道
-        float size;//粒子点精灵大小
-        float life;//寿命
+
     };
 
-    class Flame
+    class Flame: public particle::Particle
     {
     public:
         Flame()
@@ -246,18 +241,6 @@ namespace Flame {
                 particles[x].life = particles[x].lifetimeMills;
             }
         }
-
-        unsigned int mCurVBOIndex, mCurTransformFeedbackIndex;
-        GLuint mParticleBuffers[2]; //粒子发射系统的两个顶点缓存区
-        GLuint mParticleArrays[2];
-        GLuint mTransformFeedbacks[2];//粒子发射系统对应的TransformFeedback
-        GLuint mRandomTexture;//随机一维纹理
-        unsigned mSparkTexture;//Alpha纹理
-        unsigned mStartTexture;
-        float mTimer;//粒子发射器已经发射的时间
-        bool mFirst;
-        shader::MyShader* mUpdateShader;//更新粒子的GPUProgram
-        shader::MyShader* mRenderShader;//渲染粒子的GPUProgram
     };
 
 }
