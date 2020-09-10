@@ -80,14 +80,15 @@ int main(){
         glm::mat4 view = myCamera.GetViewMatrix();
         glm::mat4 projection =
                 glm::perspective(glm::radians(camera::kZoom), static_cast<float>(constvalue::kScreenWidth)
-                                                              / static_cast<float>(constvalue::kScreenHeight), 0.1f, 100.0f);
+                                                              / static_cast<float>(constvalue::kScreenHeight), 0.1f, 1000.0f);
         flame.Render(deltaTime, model, view, projection);
-        skybox.render(projection, view);
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 10.0f, -1.0f));
         model = glm::scale(model, glm::vec3(10.0f));
         ground.render(projection, view, model);
+
+        skybox.render(projection, view);
 
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;

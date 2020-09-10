@@ -36,11 +36,10 @@ namespace Flame {
     class Flame: public particle::Particle
     {
     public:
-        Flame()
+        Flame():particle::Particle()
         {
             glGetError();
-            mCurVBOIndex = 0;
-            mCurTransformFeedbackIndex = 1;
+            mCurRenderSet = 0;
             mFirst = true;
             mTimer = 0;
             const GLchar* varyings[7] = { "Type1","Position1",
@@ -70,18 +69,13 @@ namespace Flame {
             mTimer += frametimeMills*1000.0f;
             UpdateParticles(frametimeMills*1000.0f);
             RenderParticles(worldMatrix, viewMatrix, projectMatrix);
-            mCurVBOIndex = mCurTransformFeedbackIndex;
-            mCurTransformFeedbackIndex = (mCurTransformFeedbackIndex + 1) & 0x1;
+            mCurRenderSet = !mCurRenderSet;
         }
     private:
         bool InitFlame(glm::vec3 & pos)
         {
             FlameParticle particles[MAX_PARTICLES];
             memset(particles, 0, sizeof(particles));
-            particles[0].type = PARTICLE_TYPE_LAUNCHER;//设置第一个粒子的类型为发射器
-            particles[0].position = pos;
-            particles[0].lifetimeMills = 0.0f;
-            particles[0].velocity = glm::vec3(0.0f, 0.1f, 0.0f);
             GenInitLocation(particles, INIT_PARTICLES);
             glGenTransformFeedbacks(2, mTransformFeedbacks);
             glGenBuffers(2, mParticleBuffers);
@@ -118,9 +112,9 @@ namespace Flame {
             //mUpdateShader->setInt("gRandomTexture",0);
 
             glEnable(GL_RASTERIZER_DISCARD);//我们渲染到TransformFeedback缓存中去，并不需要光栅化
-            glBindVertexArray(mParticleArrays[mCurVBOIndex]);
-            glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffers[mCurVBOIndex]);
-            glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, mTransformFeedbacks[mCurTransformFeedbackIndex]);
+            glBindVertexArray(mParticleArrays[mCurRenderSet]);
+            glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffers[mCurRenderSet]);
+            glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, mTransformFeedbacks[!mCurRenderSet]);
 
             glEnableVertexAttribArray(0);//type
             glEnableVertexAttribArray(1);//position
@@ -143,7 +137,7 @@ namespace Flame {
                 mFirst = false;
             }
             else {
-                glDrawTransformFeedback(GL_POINTS, mTransformFeedbacks[mCurVBOIndex]);
+                glDrawTransformFeedback(GL_POINTS, mTransformFeedbacks[mCurRenderSet]);
             }
             glEndTransformFeedback();
             glDisableVertexAttribArray(0);
@@ -160,7 +154,7 @@ namespace Flame {
         void InitRandomTexture(unsigned int size)
         {
             srand(time(NULL));
-            glm::vec3* pRandomData = new glm::vec3[size];
+            auto* pRandomData = new glm::vec3[size];
 
             for (int i = 0; i < size; i++)
             {
@@ -189,8 +183,8 @@ namespace Flame {
             mRenderShader->setMat4("model", worldMatrix);
             mRenderShader->setMat4("view", viewMatrix);
             mRenderShader->setMat4("projection", projectMatrix);
-            glBindVertexArray(mParticleArrays[mCurTransformFeedbackIndex]);
-            glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffers[mCurTransformFeedbackIndex]);
+            glBindVertexArray(mParticleArrays[!mCurRenderSet]);
+            glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffers[!mCurRenderSet]);
             glEnableVertexAttribArray(0);
             glEnableVertexAttribArray(1);
             glEnableVertexAttribArray(2);
@@ -206,7 +200,7 @@ namespace Flame {
             glBindTexture(GL_TEXTURE_2D, mSparkTexture);
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, mStartTexture);
-            glDrawTransformFeedback(GL_POINTS, mTransformFeedbacks[mCurTransformFeedbackIndex]);
+            glDrawTransformFeedback(GL_POINTS, mTransformFeedbacks[!mCurRenderSet]);
             glDisableVertexAttribArray(0);
             glDisableVertexAttribArray(1);
             glDisableVertexAttribArray(2);
@@ -214,6 +208,7 @@ namespace Flame {
             glDisableVertexAttribArray(4);
             glBindVertexArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glEnable(GL_DEPTH_TEST);
         }
         void GenInitLocation(FlameParticle particles[], int nums)
         {

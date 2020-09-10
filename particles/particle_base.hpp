@@ -18,8 +18,24 @@ namespace particle{
         float life;
     };
     class Particle{
+    public:
+        Particle(){
+//            glGenTransformFeedbacks(2, mTransformFeedbacks);
+//            glGenBuffers(2, mParticleBuffers);
+//            glGenVertexArrays(2, mParticleArrays);
+//            for (int i = 0; i < 2; i++)
+//            {
+//                glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, mTransformFeedbacks[i]);
+//                glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffers[i]);
+//                glBindVertexArray(mParticleArrays[i]);
+//                glBufferData(GL_ARRAY_BUFFER, sizeof(particles), particles, GL_DYNAMIC_DRAW);
+//                glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, mParticleBuffers[i]);
+//            }
+//            glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
+//            glBindVertexArray(0);
+        }
     protected:
-        unsigned int mCurVBOIndex, mCurTransformFeedbackIndex;
+        bool mCurRenderSet;
         GLuint mParticleBuffers[2];
         GLuint mParticleArrays[2];
         GLuint mTransformFeedbacks[2];
