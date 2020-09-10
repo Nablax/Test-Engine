@@ -35,7 +35,7 @@ namespace particle{
         Particle(){
 
         }
-        void initParticles(){
+        void initParticles(int maxParticle, int initParticle){
             particleType particles[kMaxParticle];
             initParticleLocation(&particles[0], kInitParticle);
             glGenTransformFeedbacks(2, mTransformFeedbacks);

@@ -50,7 +50,7 @@ namespace Flame {
             mRenderShader->use();
             mRenderShader->setInt("flameSpark", 0);
             mRenderShader->setInt("flameStart", 1);
-            initParticles();
+            initParticles(kMaxParticle, kInitParticle);
         }
         ~Flame()=default;
         void Render(float frametimeMills, glm::mat4& worldMatrix,
