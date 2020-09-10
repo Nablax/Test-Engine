@@ -6,37 +6,28 @@
 #include "texture.hpp"
 #include "particle_base.hpp"
 namespace Flame {
-#define PARTICLE_TYPE_LAUNCHER 0.0f
-#define PARTICLE_TYPE_SHELL 1.0f
-    //最大速度
-#define MAX_VELOC glm::vec3(0.0,5.0,0.0)
-    //最小速度
-#define MIN_VELOC glm::vec3(0.0,3.0,0.0)
-    //最大最小速度差距
-#define DEL_VELOC glm::vec3(0.0,2.0,0.0)
-    //最长生命周期
-#define MAX_LIFE 2.0f*1000
-    //最短生命周期
-#define MIN_LIFE 1.0f*1000
-    //初始点精灵大小
-#define INIT_SIZE 30.0f;
 
-    const int MAX_PARTICLES = 18000;//定义粒子发射系统最大的粒子数
-    //初始发射器例子数量
-    const int INIT_PARTICLES = 10000;
-    //火焰中心
+    const float kParticleLauncher = 0.0f;
+    const float kParticleShell = 1.0f;
+    const glm::vec3 kMaxVelocity = glm::vec3(0.0,5.0,0.0);
+    const glm::vec3 kMinVelocity = glm::vec3(0.0,3.0,0.0);
+    const float kMaxLife = 2.0f * 1000;
+    const float kMinLife = 1.0f * 1000;
+    const float kParticleInitSize = 30.0f;
+    const int kMaxParticle = 18000;
+    const int kInitParticle = 10000;
     const glm::vec3 center(0.0f);
     const float r = 0.3f;
 
-    struct FlameParticle: particle::ParticleAttribute
+    struct FlameParticle: particle::baseParticle
     {
 
     };
 
-    class Flame: public particle::Particle
+    class Flame: public particle::Particle<FlameParticle>
     {
     public:
-        Flame():particle::Particle()
+        Flame()
         {
             glGetError();
             mCurRenderSet = 0;
@@ -47,11 +38,11 @@ namespace Flame {
                                           "Alpha1","Size1",
                                           "Life1"
             };//设置TransformFeedback要捕获的输出变量
-            mUpdateShader = new shader::MyShader("../test_shader/Update.vs", "../test_shader/Update.fs",
+            mUpdateShader = std::make_shared<shader::MyShader>("../test_shader/Update.vs", "../test_shader/Update.fs",
                                                  "../test_shader/Update.gs", varyings, 7);
             //设置TransformFeedback缓存能够记录的顶点的数据类型
 
-            mRenderShader = new shader::MyShader("../test_shader/Render.vs", "../test_shader/Render.fs");
+            mRenderShader = std::make_shared<shader::MyShader>("../test_shader/Render.vs", "../test_shader/Render.fs");
             //设置随机纹理
             InitRandomTexture(580);
             mSparkTexture = textureutils::loadTexture("../texture/particle.bmp");
@@ -59,8 +50,7 @@ namespace Flame {
             mRenderShader->use();
             mRenderShader->setInt("flameSpark", 0);
             mRenderShader->setInt("flameStart", 1);
-            glm::vec3 pos(0.0, 0.0, -3.0f);
-            InitFlame(pos);
+            initParticles();
         }
         ~Flame()=default;
         void Render(float frametimeMills, glm::mat4& worldMatrix,
@@ -72,39 +62,15 @@ namespace Flame {
             mCurRenderSet = !mCurRenderSet;
         }
     private:
-        bool InitFlame(glm::vec3 & pos)
-        {
-            FlameParticle particles[MAX_PARTICLES];
-            memset(particles, 0, sizeof(particles));
-            GenInitLocation(particles, INIT_PARTICLES);
-            glGenTransformFeedbacks(2, mTransformFeedbacks);
-            glGenBuffers(2, mParticleBuffers);
-            glGenVertexArrays(2, mParticleArrays);
-            for (int i = 0; i < 2; i++)
-            {
-                glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, mTransformFeedbacks[i]);
-                glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffers[i]);
-                glBindVertexArray(mParticleArrays[i]);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(particles), particles, GL_DYNAMIC_DRAW);
-                glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, mParticleBuffers[i]);
-            }
-            glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
-            glBindVertexArray(0);
-            //绑定纹理
-            mUpdateShader->use();
-            glBindTexture(GL_TEXTURE_1D, mRandomTexture);
-            mUpdateShader->setInt("gRandomTexture", 0);
-            return true;
-        }
         void UpdateParticles(float frametimeMills)
         {
             mUpdateShader->use();
             mUpdateShader->setFloat("gDeltaTimeMillis", frametimeMills);
             mUpdateShader->setFloat("gTime", mTimer);
-            mUpdateShader->setFloat("MAX_LIFE", MAX_LIFE);
-            mUpdateShader->setFloat("MIN_LIFE", MIN_LIFE);
-            mUpdateShader->setVec3("MAX_VELOC", MAX_VELOC);
-            mUpdateShader->setVec3("MIN_VELOC", MIN_VELOC);
+            mUpdateShader->setFloat("MAX_LIFE", kMaxLife);
+            mUpdateShader->setFloat("MIN_LIFE", kMinLife);
+            mUpdateShader->setVec3("MAX_VELOC", kMaxVelocity);
+            mUpdateShader->setVec3("MIN_VELOC", kMinVelocity);
 
             //绑定纹理
             glActiveTexture(GL_TEXTURE0);
@@ -133,7 +99,7 @@ namespace Flame {
             glBeginTransformFeedback(GL_POINTS);
             if (mFirst)
             {
-                glDrawArrays(GL_POINTS, 0, INIT_PARTICLES);
+                glDrawArrays(GL_POINTS, 0, kInitParticle);
                 mFirst = false;
             }
             else {
@@ -210,12 +176,13 @@ namespace Flame {
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glEnable(GL_DEPTH_TEST);
         }
-        void GenInitLocation(FlameParticle particles[], int nums)
+        void initParticleLocation(FlameParticle *particles, int nums) override
         {
             srand(time(NULL));
             int n = 10;
             float Adj_value = 0.05f;
             float radius = 0.7f;//火焰地区半径
+            auto deltaVelocity = kMaxVelocity - kMinVelocity;
             for (int x = 0; x < nums; x++) {
                 glm::vec3 record(0.0f);
                 for (int y = 0; y < n; y++) {//生成高斯分布的粒子，中心多，外边少
@@ -225,13 +192,13 @@ namespace Flame {
                 record.x *= radius;
                 record.z *= radius;
                 record.y = center.y;
-                particles[x].type = PARTICLE_TYPE_LAUNCHER;
+                particles[x].type = kParticleLauncher;
                 particles[x].position = record;
-                particles[x].velocity = DEL_VELOC*(float(rand()) / float(RAND_MAX)) + MIN_VELOC;//在最大最小速度之间随机选择
+                particles[x].velocity = deltaVelocity*(float(rand()) / float(RAND_MAX)) + kMinVelocity;//在最大最小速度之间随机选择
                 particles[x].alpha = 1.0f;
-                particles[x].size = INIT_SIZE;//发射器粒子大小
+                particles[x].size = kParticleInitSize;//发射器粒子大小
                 //在最短最长寿命之间随机选择
-                particles[x].lifetimeMills = (MAX_LIFE - MIN_LIFE)*(float(rand()) / float(RAND_MAX)) + MIN_LIFE;
+                particles[x].lifetimeMills = (kMaxLife - kMinLife)*(float(rand()) / float(RAND_MAX)) + kMinLife;
                 float dist = sqrt(record.x*record.x + record.z*record.z);
                 particles[x].life = particles[x].lifetimeMills;
             }
