@@ -81,7 +81,7 @@ int main(){
         glm::mat4 projection =
                 glm::perspective(glm::radians(camera::kZoom), static_cast<float>(constvalue::kScreenWidth)
                                                               / static_cast<float>(constvalue::kScreenHeight), 0.1f, 1000.0f);
-        flame.Render(deltaTime, model, view, projection);
+        flame.Render(deltaTime, projection, view, model);
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 10.0f, -1.0f));

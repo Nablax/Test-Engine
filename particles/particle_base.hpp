@@ -32,11 +32,19 @@ namespace particle{
     template<typename particleType>
     class Particle{
     public:
-        Particle(){
-
+        Particle() = default;
+        virtual ~Particle() = default;
+        void Render(float deltaTime, glm::mat4& projection,
+                    glm::mat4 &view, glm::mat4& model)
+        {
+            mTimer += deltaTime * 1000.0f;
+            updateParticles(deltaTime*1000.0f);
+            renderParticles(projection, view, model);
+            mCurRenderSet = !mCurRenderSet;
         }
+    protected:
         void initParticles(int maxParticle, int initParticle){
-            particleType particles[maxParticle];
+            particles.resize(maxParticle);
             initParticleLocation(&particles[0], initParticle);
             glGenTransformFeedbacks(2, mTransformFeedbacks);
             glGenBuffers(2, mParticleBuffers);
@@ -46,27 +54,25 @@ namespace particle{
                 glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, mTransformFeedbacks[i]);
                 glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffers[i]);
                 glBindVertexArray(mParticleArrays[i]);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(particles), particles, GL_DYNAMIC_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(particles[0]) * particles.size(), &particles[0], GL_DYNAMIC_DRAW);
                 glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, mParticleBuffers[i]);
             }
             glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
             glBindVertexArray(0);
-            //绑定纹理
             mUpdateShader->use();
             glBindTexture(GL_TEXTURE_1D, mRandomTexture);
             mUpdateShader->setInt("gRandomTexture", 0);
         }
-        virtual void initParticleLocation(particleType *particle, int initNums){
-
-        }
-    protected:
+        virtual void initParticleLocation(particleType *particle, int initNums) = 0;
+        virtual void updateParticles(float deltaTime) = 0;
+        virtual void renderParticles(glm::mat4 &projection, glm::mat4 &view, glm::mat4 &model) = 0;
         bool mCurRenderSet;
         unsigned mParticleBuffers[2], mParticleArrays[2], mTransformFeedbacks[2];
         unsigned mRandomTexture, mSparkTexture, mStartTexture;
         float mTimer;
         bool mFirst;
         std::shared_ptr<shader::MyShader> mUpdateShader, mRenderShader;
-        //std::vector<particleType> particles;
+        std::vector<particleType> particles;
     };
 }
 

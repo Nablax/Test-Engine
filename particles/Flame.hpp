@@ -53,16 +53,9 @@ namespace Flame {
             initParticles(kMaxParticle, kInitParticle);
         }
         ~Flame()=default;
-        void Render(float frametimeMills, glm::mat4& worldMatrix,
-                    glm::mat4 viewMatrix, glm::mat4& projectMatrix)
-        {
-            mTimer += frametimeMills*1000.0f;
-            UpdateParticles(frametimeMills*1000.0f);
-            RenderParticles(worldMatrix, viewMatrix, projectMatrix);
-            mCurRenderSet = !mCurRenderSet;
-        }
+
     private:
-        void UpdateParticles(float frametimeMills)
+        void updateParticles(float frametimeMills) override
         {
             mUpdateShader->use();
             mUpdateShader->setFloat("gDeltaTimeMillis", frametimeMills);
@@ -120,8 +113,7 @@ namespace Flame {
         void InitRandomTexture(unsigned int size)
         {
             srand(time(NULL));
-            auto* pRandomData = new glm::vec3[size];
-
+            std::unique_ptr<glm::vec3[]> pRandomData(new glm::vec3[size]);
             for (int i = 0; i < size; i++)
             {
                 pRandomData[i].x = float(rand()) / float(RAND_MAX);
@@ -130,15 +122,12 @@ namespace Flame {
             }
             glGenTextures(1, &mRandomTexture);
             glBindTexture(GL_TEXTURE_1D, mRandomTexture);
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, size, 0, GL_RGB, GL_FLOAT, pRandomData);
+            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, size, 0, GL_RGB, GL_FLOAT, pRandomData.get());
             glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameterf(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            delete[] pRandomData;
-            pRandomData = nullptr;
         }
-        void RenderParticles(glm::mat4& worldMatrix,
-                             glm::mat4& viewMatrix, glm::mat4& projectMatrix)
+        void renderParticles(glm::mat4& projection, glm::mat4& view, glm::mat4& model) override
         {
             glEnable(GL_PROGRAM_POINT_SIZE);
             glDisable(GL_DEPTH_TEST);
@@ -146,9 +135,9 @@ namespace Flame {
             glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
             mRenderShader->use();
-            mRenderShader->setMat4("model", worldMatrix);
-            mRenderShader->setMat4("view", viewMatrix);
-            mRenderShader->setMat4("projection", projectMatrix);
+            mRenderShader->setMat4("model", model);
+            mRenderShader->setMat4("view", view);
+            mRenderShader->setMat4("projection", projection);
             glBindVertexArray(mParticleArrays[!mCurRenderSet]);
             glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffers[!mCurRenderSet]);
             glEnableVertexAttribArray(0);
